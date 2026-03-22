@@ -4,11 +4,11 @@ import { config } from "./config.js";
 export const connectToDB = async () => {
   let MONGO_URI = "";
 
-  if (config.NODE_ENV === "developement") {
+  if (config.NODE_ENV === "DEVELOPEMENT") {
     MONGO_URI = config.LOCAL_MONGO_URI;
   }
 
-  if (config.NODE_ENV === "production") {
+  if (config.NODE_ENV === "PRODUCTION") {
     MONGO_URI = config.MONGO_URI;
   }
 
