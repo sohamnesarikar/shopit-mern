@@ -1,11 +1,17 @@
 import { Product } from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
+import ApiFilters from "../utils/ApiFilters.js";
 
 // Get all products => /api/v1/products
 export const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find();
+  const apiFilters = new ApiFilters(Product, req.query).search();
+
+  const products = await apiFilters.query;
+  const count = products.length;
+
   res.status(200).json({
+    count,
     products,
   });
 });
