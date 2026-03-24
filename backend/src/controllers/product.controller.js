@@ -5,10 +5,14 @@ import ApiFilters from "../utils/ApiFilters.js";
 
 // Get all products => /api/v1/products
 export const getProducts = asyncHandler(async (req, res) => {
-  const apiFilters = new ApiFilters(Product, req.query).search();
+  const resPerPage = 4;
+  const apiFilters = new ApiFilters(Product, req.query).search().filters();
 
-  const products = await apiFilters.query;
-  const count = products.length;
+  let products = await apiFilters.query;
+  let count = products.length;
+
+  apiFilters.pagination(resPerPage);
+  products = await apiFilters.query.clone();
 
   res.status(200).json({
     count,
