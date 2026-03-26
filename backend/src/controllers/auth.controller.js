@@ -2,6 +2,7 @@ import { User } from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+// register user => /api/v1/register
 export const registerUser = asyncHandler(async (req, res, next) => {
   const { name, email, password } = req.body;
 
@@ -13,6 +14,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   });
 });
 
+// login user => /api/v1/login
 export const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -38,11 +40,26 @@ export const loginUser = asyncHandler(async (req, res, next) => {
     httpOnly: true,
     secure: true,
     sameSite: "strict",
-    maxAge: 1000 * 60 * 60 * 24 * 4, // 4 days
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 4), // 4 days
   });
 
   res.status(200).json({
     success: true,
     token,
+  });
+});
+
+// logut user => /api/v1/logout
+export const logoutUser = asyncHandler(async (req, res, next) => {
+  res.cookie("accessToken", null, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    expires: new Date(Date.now()),
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
   });
 });
