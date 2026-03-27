@@ -6,11 +6,16 @@ import {
   getProducts,
   updateProduct,
 } from "../controllers/product.controller.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import {
+  authMiddleware,
+  authorizeRoles,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.route("/products").get(authMiddleware, getProducts);
+router
+  .route("/products")
+  .get(authMiddleware, authorizeRoles("admin"), getProducts);
 router.route("/products/:id").get(getProduct);
 
 // admin routes

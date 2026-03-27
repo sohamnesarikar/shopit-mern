@@ -27,3 +27,15 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+export const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      throw new ApiError(
+        403,
+        `Role (${req.user.role}) is not allowed to access this resource`,
+      );
+    }
+    next();
+  };
+};
