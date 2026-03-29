@@ -13,13 +13,16 @@ import {
 
 const router = express.Router();
 
-router
-  .route("/products")
-  .get(authMiddleware, authorizeRoles("admin"), getProducts);
+router.route("/products").get(getProducts);
 router.route("/products/:id").get(getProduct);
 
 // admin routes
-router.route("/admin/products").post(createProduct);
-router.route("/admin/products/:id").delete(deleteProduct).put(updateProduct);
+router
+  .route("/admin/products")
+  .post(authMiddleware, authorizeRoles("admin"), createProduct);
+router
+  .route("/admin/products/:id")
+  .delete(authMiddleware, authorizeRoles("admin"), deleteProduct)
+  .put(authMiddleware, authorizeRoles("admin"), updateProduct);
 
 export default router;

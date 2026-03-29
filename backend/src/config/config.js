@@ -9,6 +9,12 @@ const _config = {
   MONGO_URI: process.env.MONGO_URI,
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
   JWT_EXPIRE_TIME: process.env.JWT_EXPIRE_TIME,
+  MAILTRAP_HOST: process.env.MAILTRAP_HOST,
+  MAILTRAP_PORT: process.env.MAILTRAP_PORT,
+  MAILTRAP_USER: process.env.MAILTRAP_USER,
+  MAILTRAP_PASSWORD: process.env.MAILTRAP_PASSWORD,
+  MAILTRAP_SMTP_FROM_EMAIL: process.env.MAILTRAP_SMTP_FROM_EMAIL,
+  MAILTRAP_SMTP_FROM_NAME: process.env.MAILTRAP_SMTP_FROM_NAME,
 };
 
 export const config = Object.freeze(_config);
