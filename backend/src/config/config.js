@@ -15,6 +15,7 @@ const _config = {
   MAILTRAP_PASSWORD: process.env.MAILTRAP_PASSWORD,
   MAILTRAP_SMTP_FROM_EMAIL: process.env.MAILTRAP_SMTP_FROM_EMAIL,
   MAILTRAP_SMTP_FROM_NAME: process.env.MAILTRAP_SMTP_FROM_NAME,
+  FRONTEND_URI: process.env.FRONTEND_URI,
 };
 
 export const config = Object.freeze(_config);

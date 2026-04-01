@@ -1,6 +1,10 @@
+import crypto from "node:crypto";
+import { config } from "../config/config.js";
 import { User } from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { resetPasswordTemplate } from "../utils/emailTemplates.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 // register user => /api/v1/register
 export const registerUser = asyncHandler(async (req, res, next) => {
@@ -62,4 +66,79 @@ export const logoutUser = asyncHandler(async (req, res, next) => {
     success: true,
     message: "Logged out successfully",
   });
+});
+
+// forgot password => /api/v1/password/forgot
+export const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const token = user.generateResetPasswordToken();
+
+  await user.save();
+
+  const resetUrl = `${config.FRONTEND_URI}/forgot-password/${token}`;
+
+  const htmlTemplate = resetPasswordTemplate(user?.name, resetUrl);
+
+  const options = {
+    email: user.email,
+    subject: "NexCart Password Recovery",
+    html: htmlTemplate,
+  };
+
+  try {
+    await sendEmail(options);
+    res
+      .status(200)
+      .json({ success: true, message: `Email send to: ${user?.name}` });
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+    throw new ApiError(500, err?.message);
+  }
+});
+
+// reset password => /api/v1/password/reset
+export const resetPassword = asyncHandler(async (req, res, next) => {
+  const token = req.params.token;
+  const { newPassword, confirmPassword } = req.body;
+
+  const hashedResetPasswordToken = crypto
+    .createHash("SHA256")
+    .update(token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedResetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(
+      400,
+      "Password reset token is invalid or has been expired",
+    );
+  }
+
+  if (newPassword !== confirmPassword) {
+    throw new ApiError(400, "Password does not match");
+  }
+
+  user.password = newPassword;
+
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password reset successfully" });
 });
