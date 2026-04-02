@@ -142,3 +142,35 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Password reset successfully" });
 });
+
+// Get current user profile  =>  /api/v1/me
+export const getUserProfile = asyncHandler(async (req, res, next) => {
+  const currentUser = req.user?._id;
+  const user = await User.findById(currentUser);
+
+  res.status(200).json({ success: true, user });
+});
+
+// Update Password  =>  /api/v1/password/update
+export const updatePassword = asyncHandler(async (req, res, next) => {
+  const { currentPassword, password } = req.body;
+  const userId = req.user?._id;
+
+  const user = await User.findById(userId).select("+password");
+
+  // check current password is correct
+  const isCorrectPassword = await user.comparePassword(currentPassword);
+
+  if (!isCorrectPassword) {
+    throw new ApiError(400, "Old password is incorrect");
+  }
+
+  user.password = password;
+  await user.save();
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password update successfully" });
+});
+
+// Update User Profile  =>  /api/v1/me/update
