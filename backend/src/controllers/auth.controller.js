@@ -174,3 +174,17 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 });
 
 // Update User Profile  =>  /api/v1/me/update
+export const updateUserProfile = asyncHandler(async (req, res, next) => {
+  const { name, email } = req.body;
+  const userId = req.user?._id;
+
+  const newData = { name, email };
+
+  const user = await User.findByIdAndUpdate(userId, newData, {
+    returnDocument: "after",
+  });
+
+  res
+    .status(200)
+    .json({ success: true, message: "Profile updated successfully", user });
+});
