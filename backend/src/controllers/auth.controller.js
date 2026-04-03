@@ -208,3 +208,36 @@ export const getUserDetails = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ success: true, user });
 });
+
+// Update User Details - ADMIN  =>  /api/v1/admin/users/:id
+export const updateUserDetails = asyncHandler(async (req, res, next) => {
+  const { name, email, role } = req.body;
+  const { id } = req.params;
+
+  const newData = { name, email, role };
+
+  const user = await User.findByIdAndUpdate(id, newData, {
+    returnDocument: "after",
+  });
+
+  if (!user) {
+    throw new ApiError(404, `User not found with id: ${id}`);
+  }
+
+  res
+    .status(200)
+    .json({ success: true, message: "User updated successfully", user });
+});
+
+// Delete User - ADMIN  =>  /api/v1/admin/users/:id
+export const deleteUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const user = await User.findByIdAndDelete(id);
+
+  if (!user) {
+    throw new ApiError(404, `User not found with id: ${id}`);
+  }
+
+  res.status(200).json({ success: true, message: "User deleted successfully" });
+});
