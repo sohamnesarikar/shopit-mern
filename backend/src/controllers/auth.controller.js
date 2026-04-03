@@ -188,3 +188,23 @@ export const updateUserProfile = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Profile updated successfully", user });
 });
+
+// Get all Users - ADMIN  =>  /api/v1/admin/users
+export const getAllUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find();
+
+  res.status(200).json({ success: true, users });
+});
+
+// Get User Details - ADMIN  =>  /api/v1/admin/users/:id
+export const getUserDetails = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new ApiError(404, `User not found with id: ${id}`);
+  }
+
+  res.status(200).json({ success: true, user });
+});

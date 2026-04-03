@@ -1,6 +1,8 @@
 import express from "express";
 import {
   forgotPassword,
+  getAllUsers,
+  getUserDetails,
   getUserProfile,
   loginUser,
   logoutUser,
@@ -9,7 +11,10 @@ import {
   updatePassword,
   updateUserProfile,
 } from "../controllers/auth.controller.js";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
+import {
+  authMiddleware,
+  authorizeRoles,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -23,5 +28,12 @@ router.route("/password/reset/:token").post(resetPassword);
 router.route("/me").get(authMiddleware, getUserProfile);
 router.route("/me/update").put(authMiddleware, updateUserProfile);
 router.route("/password/update").put(authMiddleware, updatePassword);
+
+router
+  .route("/admin/users")
+  .get(authMiddleware, authorizeRoles("admin"), getAllUsers);
+router
+  .route("/admin/users/:id")
+  .get(authMiddleware, authorizeRoles("admin"), getUserDetails);
 
 export default router;
